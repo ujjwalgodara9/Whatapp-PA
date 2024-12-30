@@ -2,16 +2,21 @@ import os
 from io import BytesIO
 
 import chainlit as cl
+from langchain_core.messages import HumanMessage
 
-from langchain_runnable import get_runnable_with_history
-from speech_to_text import speech_to_text
+from ai_companion.graph.agent import graph
+from ai_companion.modules.speech import SpeechToText
+
 from text_to_image import create_scenario, generate_image
-from text_to_speech import text_to_speech
 
 
 @cl.on_chat_start
 async def on_chat_start():
     """Initialize the chat session"""
+    speech_to_text_module = SpeechToText()
+    
+    cl.user_session.set("speech_to_text", speech_to_text_module)
+    
     await cl.Message(content="Hello! I'm your AI companion. How can I help you today?").send()
 
 
@@ -46,16 +51,34 @@ async def on_message(message: cl.Message):
         return
 
     # Handle regular text messages
-    runnable = get_runnable_with_history()
     msg = cl.Message(content="")
     async with cl.Step(type="run"):
-        async for chunk in runnable.astream(
-            {"question": message.content},
-            {"configurable": {"session_id": cl.user_session.get("id")}},
-        ):
-            await msg.stream_token(chunk)
-
-    await msg.send()
+        async for chunk in graph.astream(
+            {"messages": [HumanMessage(content=message.content)]},
+            {"configurable": {"thread_id": "1"}},
+            stream_mode="messages"
+        ):  
+            if chunk[1]["langgraph_node"] == "conversation_node":
+                await msg.stream_token(chunk[0].content)
+    
+    output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
+    
+    if output_state.values.get("workflow") == "audio":
+        response = output_state.values["messages"][-1].content
+        audio_buffer = output_state.values["audio_buffer"] 
+        output_audio_el = cl.Audio(
+            name="Audio",
+            auto_play=True,
+            mime="audio/mpeg3",
+            content=audio_buffer,
+        )
+        await cl.Message(content=response, elements=[output_audio_el]).send()
+    elif output_state.values.get("workflow") == "image":
+        response = output_state.values["messages"][-1].content
+        image = cl.Image(path=output_state.values["image_path"], display="inline")
+        await cl.Message(content=response, elements=[image]).send()
+    else:
+        await msg.send()
 
 
 @cl.on_audio_chunk
@@ -82,23 +105,33 @@ async def on_audio_end(elements):
     await cl.Message(author="You", content="", elements=[input_audio_el, *elements]).send()
 
     # Convert speech to text
-    transcription = await speech_to_text(audio_data)
+    speech_to_text = cl.user_session.get("speech_to_text")
+    transcription = await speech_to_text.transcribe(audio_data)
 
-    # Generate response using runnable with history
-    runnable = get_runnable_with_history()
-    response = await runnable.ainvoke(
-        {"question": transcription},
-        {"configurable": {"session_id": cl.user_session.get("id")}},
-    )
-
-    # Convert response to speech
-    output_audio = await text_to_speech(response)
-
-    # Send audio response
-    output_audio_el = cl.Audio(
-        name="Audio",
-        auto_play=True,
-        mime="audio/mpeg3",
-        content=output_audio,
-    )
-    await cl.Message(content=response, elements=[output_audio_el]).send()
+    # Handle regular text messages
+    msg = cl.Message(content="")
+    async with cl.Step(type="run"):
+        async for chunk in graph.astream(
+            {"messages": [HumanMessage(content=transcription)]},
+            {"configurable": {"thread_id": "1"}},
+            stream_mode="messages"
+        ):  
+            if chunk[1]["langgraph_node"] == "conversation_node":
+                await msg.stream_token(chunk[0].content)
+    
+    output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
+    
+    if output_state.values.get("workflow") == "audio":
+        response = output_state.values["messages"][-1].content
+        audio_buffer = output_state.values["audio_buffer"] 
+        output_audio_el = cl.Audio(
+            name="Audio",
+            auto_play=True,
+            mime="audio/mpeg3",
+            content=audio_buffer,
+        )
+        await cl.Message(content=response, elements=[output_audio_el]).send()
+    elif output_state.values.get("workflow") == "image":
+        pass
+    else:
+        await msg.send()
