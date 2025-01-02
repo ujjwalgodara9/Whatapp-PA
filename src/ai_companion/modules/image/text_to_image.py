@@ -10,35 +10,47 @@ from together import Together
 from ai_companion.settings import settings
 from ai_companion.core.exceptions import TextToImageError
 from ai_companion.core.prompts import IMAGE_SCENARIO_PROMPT, IMAGE_ENHANCEMENT_PROMPT
+
+
 class ScenarioPrompt(BaseModel):
     """Class for the scenario response"""
-    narrative: str = Field(..., description="The AI's narrative response to the question")
-    image_prompt: str = Field(..., description="The visual prompt to generate an image representing the scene")
+
+    narrative: str = Field(
+        ..., description="The AI's narrative response to the question"
+    )
+    image_prompt: str = Field(
+        ..., description="The visual prompt to generate an image representing the scene"
+    )
+
 
 class EnhancedPrompt(BaseModel):
     """Class for the text prompt"""
+
     content: str = Field(
         ...,
         description="The enhanced text prompt to generate an image",
     )
 
+
 class TextToImage:
     """A class to handle text-to-image generation using Together AI."""
-    
+
     REQUIRED_ENV_VARS = ["GROQ_API_KEY", "TOGETHER_API_KEY"]
-    
+
     def __init__(self):
         """Initialize the TextToImage class and validate environment variables."""
         self._validate_env_vars()
         self._together_client: Optional[Together] = None
         self.logger = logging.getLogger(__name__)
-    
+
     def _validate_env_vars(self) -> None:
         """Validate that all required environment variables are set."""
         missing_vars = [var for var in self.REQUIRED_ENV_VARS if not os.getenv(var)]
         if missing_vars:
-            raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
-    
+            raise ValueError(
+                f"Missing required environment variables: {', '.join(missing_vars)}"
+            )
+
     @property
     def together_client(self) -> Together:
         """Get or create Together client instance using singleton pattern."""
@@ -77,7 +89,9 @@ class TextToImage:
         except Exception as e:
             raise TextToImageError(f"Failed to generate image: {str(e)}") from e
 
-    async def create_scenario(self, message: str, chat_history: list = None) -> ScenarioPrompt:
+    async def create_scenario(
+        self, message: str, chat_history: list = None
+    ) -> ScenarioPrompt:
         """Creates a first-person narrative scenario and corresponding image prompt."""
         try:
             self.logger.info(f"Creating scenario from message: '{message}'")
