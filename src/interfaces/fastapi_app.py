@@ -1,7 +1,7 @@
 from chainlit.utils import mount_chainlit
 from fastapi import FastAPI
 
-from whatsapp_response import whatsapp_router
+from interfaces.whatsapp_response import whatsapp_router
 
 # Create FastAPI app
 app = FastAPI()
