@@ -10,37 +10,39 @@ from ai_companion.settings import settings
 
 class SpeechToText:
     """A class to handle speech-to-text conversion using Groq's Whisper model."""
-    
+
     # Required environment variables
     REQUIRED_ENV_VARS = ["GROQ_API_KEY"]
-    
+
     def __init__(self):
         """Initialize the SpeechToText class and validate environment variables."""
         self._validate_env_vars()
         self._client: Optional[Groq] = None
-    
+
     def _validate_env_vars(self) -> None:
         """Validate that all required environment variables are set."""
         missing_vars = [var for var in self.REQUIRED_ENV_VARS if not os.getenv(var)]
         if missing_vars:
-            raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
-    
+            raise ValueError(
+                f"Missing required environment variables: {', '.join(missing_vars)}"
+            )
+
     @property
     def client(self) -> Groq:
         """Get or create Groq client instance using singleton pattern."""
         if self._client is None:
             self._client = Groq(api_key=settings.GROQ_API_KEY)
         return self._client
-    
+
     async def transcribe(self, audio_data: bytes) -> str:
         """Convert speech to text using Groq's Whisper model.
-        
+
         Args:
             audio_data: Binary audio data
-            
+
         Returns:
             str: Transcribed text
-            
+
         Raises:
             ValueError: If the audio file is empty or invalid
             RuntimeError: If the transcription fails
@@ -74,4 +76,6 @@ class SpeechToText:
                 os.unlink(temp_file_path)
 
         except Exception as e:
-            raise SpeechToTextError(f"Speech-to-text conversion failed: {str(e)}") from e
+            raise SpeechToTextError(
+                f"Speech-to-text conversion failed: {str(e)}"
+            ) from e

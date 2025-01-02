@@ -1,4 +1,3 @@
-import os
 from io import BytesIO
 
 import chainlit as cl
@@ -9,14 +8,15 @@ from ai_companion.modules.speech import SpeechToText
 
 from ai_companion.modules.speech.text_to_speech import TextToSpeech
 
+
 @cl.on_chat_start
 async def on_chat_start():
     """Initialize the chat session"""
     speech_to_text_module = SpeechToText()
-    
+
     cl.user_session.set("speech_to_text", speech_to_text_module)
-    
-    
+
+
 @cl.on_message
 async def on_message(message: cl.Message):
     """Handle text messages"""
@@ -26,16 +26,19 @@ async def on_message(message: cl.Message):
         async for chunk in graph.astream(
             {"messages": [HumanMessage(content=message.content)]},
             {"configurable": {"thread_id": "1"}},
-            stream_mode="messages"
-        ):  
-            if chunk[1]["langgraph_node"] == "conversation_node" and type(chunk[0]) == AIMessageChunk:
+            stream_mode="messages",
+        ):
+            if (
+                chunk[1]["langgraph_node"] == "conversation_node"
+                and type(chunk[0]) == AIMessageChunk
+            ):
                 await msg.stream_token(chunk[0].content)
-    
+
     output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
-    
+
     if output_state.values.get("workflow") == "audio":
         response = output_state.values["messages"][-1].content
-        audio_buffer = output_state.values["audio_buffer"] 
+        audio_buffer = output_state.values["audio_buffer"]
         output_audio_el = cl.Audio(
             name="Audio",
             auto_play=True,
@@ -72,19 +75,21 @@ async def on_audio_end(elements):
 
     # Show user's audio message
     input_audio_el = cl.Audio(mime="audio/mpeg3", content=audio_data)
-    await cl.Message(author="You", content="", elements=[input_audio_el, *elements]).send()
+    await cl.Message(
+        author="You", content="", elements=[input_audio_el, *elements]
+    ).send()
 
     # Convert speech to text
     speech_to_text = cl.user_session.get("speech_to_text")
     transcription = await speech_to_text.transcribe(audio_data)
-    
+
     output_state = await graph.ainvoke(
         {"messages": [HumanMessage(content=transcription)]},
-        {"configurable": {"thread_id": "1"}}
+        {"configurable": {"thread_id": "1"}},
     )
-        
+
     audio_buffer = await TextToSpeech().synthesize(output_state["messages"][-1].content)
-    
+
     output_audio_el = cl.Audio(
         name="Audio",
         auto_play=True,
@@ -92,7 +97,5 @@ async def on_audio_end(elements):
         content=audio_buffer,
     )
     await cl.Message(
-        content=output_state["messages"][-1].content,
-        elements=[output_audio_el]
+        content=output_state["messages"][-1].content, elements=[output_audio_el]
     ).send()
-

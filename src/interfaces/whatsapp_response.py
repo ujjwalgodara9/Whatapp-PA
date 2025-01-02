@@ -106,7 +106,9 @@ async def process_audio_message(message: Dict) -> str:
     return await speech_to_text(audio_data)
 
 
-async def send_response(from_number: str, response_text: str, message_type: str = "text") -> bool:
+async def send_response(
+    from_number: str, response_text: str, message_type: str = "text"
+) -> bool:
     """Send response to user via WhatsApp API."""
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
@@ -136,7 +138,9 @@ async def send_response(from_number: str, response_text: str, message_type: str 
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"https://graph.facebook.com/v21.0/{WHATSAPP_PHONE_NUMBER_ID}/messages", headers=headers, json=json_data
+            f"https://graph.facebook.com/v21.0/{WHATSAPP_PHONE_NUMBER_ID}/messages",
+            headers=headers,
+            json=json_data,
         )
 
     return response.status_code == 200
