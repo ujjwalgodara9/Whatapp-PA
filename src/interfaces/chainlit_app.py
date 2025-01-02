@@ -2,13 +2,12 @@ import os
 from io import BytesIO
 
 import chainlit as cl
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessageChunk
 
 from ai_companion.graph.agent import graph
 from ai_companion.modules.speech import SpeechToText
 
-from text_to_image import create_scenario, generate_image
-
+from ai_companion.modules.speech.text_to_speech import TextToSpeech
 
 @cl.on_chat_start
 async def on_chat_start():
@@ -17,39 +16,10 @@ async def on_chat_start():
     
     cl.user_session.set("speech_to_text", speech_to_text_module)
     
-    await cl.Message(content="Hello! I'm your AI companion. How can I help you today?").send()
-
-
-async def handle_image_scenario(prompt: str):
-    """
-    Generate and send a first-person scenario with matching image.
-
-    Args:
-        prompt: The user's prompt after "/image"
-    """
-    # Create scenario and generate image
-    scenario = await create_scenario(prompt)
-
-    # Generate and save image
-    os.makedirs("generated_images", exist_ok=True)
-    img_path = f"generated_images/image_{cl.user_session.get('id')}.png"
-    # enhanced_prompt = await enhance_prompt(scenario.image_prompt)
-    await generate_image(scenario.image_prompt, img_path)
-
-    # Send response with image
-    image = cl.Image(path=img_path, display="inline")
-    await cl.Message(content=scenario.narrative, elements=[image]).send()
-
-
+    
 @cl.on_message
 async def on_message(message: cl.Message):
     """Handle text messages"""
-    # Check if message starts with "/image"
-    if message.content.startswith("/image"):
-        prompt = message.content[6:].strip()
-        await handle_image_scenario(prompt)
-        return
-
     # Handle regular text messages
     msg = cl.Message(content="")
     async with cl.Step(type="run"):
@@ -58,7 +28,7 @@ async def on_message(message: cl.Message):
             {"configurable": {"thread_id": "1"}},
             stream_mode="messages"
         ):  
-            if chunk[1]["langgraph_node"] == "conversation_node":
+            if chunk[1]["langgraph_node"] == "conversation_node" and type(chunk[0]) == AIMessageChunk:
                 await msg.stream_token(chunk[0].content)
     
     output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
@@ -107,31 +77,22 @@ async def on_audio_end(elements):
     # Convert speech to text
     speech_to_text = cl.user_session.get("speech_to_text")
     transcription = await speech_to_text.transcribe(audio_data)
+    
+    output_state = await graph.ainvoke(
+        {"messages": [HumanMessage(content=transcription)]},
+        {"configurable": {"thread_id": "1"}}
+    )
+        
+    audio_buffer = await TextToSpeech().synthesize(output_state["messages"][-1].content)
+    
+    output_audio_el = cl.Audio(
+        name="Audio",
+        auto_play=True,
+        mime="audio/mpeg3",
+        content=audio_buffer,
+    )
+    await cl.Message(
+        content=output_state["messages"][-1].content,
+        elements=[output_audio_el]
+    ).send()
 
-    # Handle regular text messages
-    msg = cl.Message(content="")
-    async with cl.Step(type="run"):
-        async for chunk in graph.astream(
-            {"messages": [HumanMessage(content=transcription)]},
-            {"configurable": {"thread_id": "1"}},
-            stream_mode="messages"
-        ):  
-            if chunk[1]["langgraph_node"] == "conversation_node":
-                await msg.stream_token(chunk[0].content)
-    
-    output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
-    
-    if output_state.values.get("workflow") == "audio":
-        response = output_state.values["messages"][-1].content
-        audio_buffer = output_state.values["audio_buffer"] 
-        output_audio_el = cl.Audio(
-            name="Audio",
-            auto_play=True,
-            mime="audio/mpeg3",
-            content=audio_buffer,
-        )
-        await cl.Message(content=response, elements=[output_audio_el]).send()
-    elif output_state.values.get("workflow") == "image":
-        pass
-    else:
-        await msg.send()
