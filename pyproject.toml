@@ -17,4 +17,5 @@ dependencies = [
     "langgraph>=0.2.60",
     "langchain-openai>=0.2.14",
     "pydantic-settings>=2.7.0",
+    "pre-commit>=4.0.1",
 ]
