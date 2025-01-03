@@ -1,14 +1,13 @@
 from chainlit.utils import mount_chainlit
 from fastapi import FastAPI
 
-# TODO: Adapt whatsapp_response to the new repo structure and add image to text logic
-# from interfaces.whatsapp_response import whatsapp_router
+from interfaces.whatsapp_response import whatsapp_router
 
 # Create FastAPI app
 app = FastAPI()
 
 # Include the WhatsApp webhook endpoint
-# app.include_router(whatsapp_router)
+app.include_router(whatsapp_router)
 
 # Mount Chainlit app
 mount_chainlit(app=app, target="interfaces/chainlit_app.py", path="/chat")
