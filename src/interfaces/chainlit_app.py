@@ -1,11 +1,11 @@
 from io import BytesIO
 
 import chainlit as cl
-from langchain_core.messages import HumanMessage, AIMessageChunk
+from langchain_core.messages import AIMessageChunk, HumanMessage
 
 from ai_companion.graph.agent import graph
+from ai_companion.graph.utils.helpers import get_image_to_text_module
 from ai_companion.modules.speech import SpeechToText
-
 from ai_companion.modules.speech.text_to_speech import TextToSpeech
 
 
@@ -13,18 +13,39 @@ from ai_companion.modules.speech.text_to_speech import TextToSpeech
 async def on_chat_start():
     """Initialize the chat session"""
     speech_to_text_module = SpeechToText()
-
     cl.user_session.set("speech_to_text", speech_to_text_module)
 
 
 @cl.on_message
 async def on_message(message: cl.Message):
-    """Handle text messages"""
-    # Handle regular text messages
+    """Handle text messages and images"""
     msg = cl.Message(content="")
+
+    # Process any attached images
+    content = message.content
+    if message.elements:
+        image_to_text = get_image_to_text_module()
+
+        for elem in message.elements:
+            if isinstance(elem, cl.Image):
+                # Read image file content
+                with open(elem.path, "rb") as f:
+                    image_bytes = f.read()
+
+                # Analyze image and add to message content
+                try:
+                    description = await image_to_text.analyze_image(
+                        image_bytes,  # Pass bytes instead of path
+                        "Please describe what you see in this image in the context of our conversation.",
+                    )
+                    content += f"\n[Image Analysis: {description}]"
+                except Exception as e:
+                    cl.logger.warning(f"Failed to analyze image: {e}")
+
+    # Process through graph with enriched message content
     async with cl.Step(type="run"):
         async for chunk in graph.astream(
-            {"messages": [HumanMessage(content=message.content)]},
+            {"messages": [HumanMessage(content=content)]},
             {"configurable": {"thread_id": "1"}},
             stream_mode="messages",
         ):
