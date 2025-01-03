@@ -49,9 +49,8 @@ async def on_message(message: cl.Message):
             {"configurable": {"thread_id": "1"}},
             stream_mode="messages",
         ):
-            if (
-                chunk[1]["langgraph_node"] == "conversation_node"
-                and type(chunk[0]) == AIMessageChunk
+            if chunk[1]["langgraph_node"] == "conversation_node" and isinstance(
+                chunk[0], AIMessageChunk
             ):
                 await msg.stream_token(chunk[0].content)
 
