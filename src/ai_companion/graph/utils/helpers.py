@@ -6,6 +6,7 @@ from langchain_groq import ChatGroq
 from ai_companion.modules.speech import TextToSpeech
 from ai_companion.settings import settings
 from ai_companion.modules.image.text_to_image import TextToImage
+from ai_companion.modules.image.image_to_text import ImageToText
 
 
 def get_chat_model():
@@ -21,6 +22,10 @@ def get_text_to_speech_module():
 
 def get_text_to_image_module():
     return TextToImage()
+
+
+def get_image_to_text_module():
+    return ImageToText()
 
 
 def remove_asterisk_content(text: str) -> str:

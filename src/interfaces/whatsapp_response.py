@@ -1,14 +1,15 @@
 import logging
 import os
-from fastapi import APIRouter, Request, Response
-import httpx
 from io import BytesIO
 from typing import Dict
 
-from langchain_runnable import get_runnable_with_history
-from speech_to_text import speech_to_text
-from text_to_speech import text_to_speech
-from text_to_image import create_scenario, generate_image
+import httpx
+from fastapi import APIRouter, Request, Response
+from langchain_core.messages import HumanMessage
+
+from ai_companion.graph.agent import graph
+from ai_companion.modules.image import ImageToText
+from ai_companion.modules.speech import SpeechToText
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -19,6 +20,10 @@ whatsapp_router = APIRouter()
 # WhatsApp API credentials
 WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
+
+# Initialize modules
+image_to_text = ImageToText()
+speech_to_text = SpeechToText()
 
 
 @whatsapp_router.api_route("/whatsapp_response", methods=["GET", "POST"])
@@ -39,31 +44,54 @@ async def whatsapp_handler(request: Request) -> Response:
             from_number = message["from"]
             session_id = from_number
 
-            # Get user message
+            # Get user message and handle different message types
+            content = ""
             if message["type"] == "audio":
-                message_text = await process_audio_message(message)
+                content = await process_audio_message(message)
+            elif message["type"] == "image":
+                # Get image caption if any
+                content = message.get("image", {}).get("caption", "")
+                # Download and analyze image
+                image_bytes = await download_media(message["image"]["id"])
+                try:
+                    description = await image_to_text.analyze_image(
+                        image_bytes,
+                        "Please describe what you see in this image in the context of our conversation.",
+                    )
+                    content += f"\n[Image Analysis: {description}]"
+                except Exception as e:
+                    logger.warning(f"Failed to analyze image: {e}")
             else:
-                message_text = message["text"]["body"]
+                content = message["text"]["body"]
 
-            # Check if message starts with /image
-            if message_text.startswith("/image"):
-                prompt = message_text[6:].strip()
-                success = await handle_image_scenario(from_number, prompt)
-                if not success:
-                    return Response(content="Failed to send image", status_code=500)
-                return Response(content="Image processed", status_code=200)
-
-            # Get runnable with message history
-            runnable = get_runnable_with_history()
-
-            # Process message with the runnable
-            response_text = await runnable.ainvoke(
-                {"question": message_text},
-                {"configurable": {"session_id": session_id}},
+            # Process message through the graph agent
+            await graph.ainvoke(
+                {"messages": [HumanMessage(content=content)]},
+                {"configurable": {"thread_id": session_id}},
             )
 
-            # Send response
-            success = await send_response(from_number, response_text, message["type"])
+            # Get the workflow type and response from the state
+            output_state = graph.get_state(
+                config={"configurable": {"thread_id": session_id}}
+            )
+            workflow = output_state.values.get("workflow", "conversation")
+            response_message = output_state.values["messages"][-1].content
+
+            # Handle different response types based on workflow
+            if workflow == "audio":
+                audio_buffer = output_state.values["audio_buffer"]
+                success = await send_response(
+                    from_number, response_message, "audio", audio_buffer
+                )
+            elif workflow == "image":
+                image_path = output_state.values["image_path"]
+                with open(image_path, "rb") as f:
+                    image_data = f.read()
+                success = await send_response(
+                    from_number, response_message, "image", image_data
+                )
+            else:
+                success = await send_response(from_number, response_message, "text")
 
             if not success:
                 return Response(content="Failed to send message", status_code=500)
@@ -79,6 +107,22 @@ async def whatsapp_handler(request: Request) -> Response:
     except Exception as e:
         logger.error(f"Error processing message: {e}", exc_info=True)
         return Response(content="Internal server error", status_code=500)
+
+
+async def download_media(media_id: str) -> bytes:
+    """Download media from WhatsApp."""
+    media_metadata_url = f"https://graph.facebook.com/v21.0/{media_id}"
+    headers = {"Authorization": f"Bearer {WHATSAPP_TOKEN}"}
+
+    async with httpx.AsyncClient() as client:
+        metadata_response = await client.get(media_metadata_url, headers=headers)
+        metadata_response.raise_for_status()
+        metadata = metadata_response.json()
+        download_url = metadata.get("url")
+
+        media_response = await client.get(download_url, headers=headers)
+        media_response.raise_for_status()
+        return media_response.content
 
 
 async def process_audio_message(message: Dict) -> str:
@@ -103,11 +147,14 @@ async def process_audio_message(message: Dict) -> str:
     audio_buffer.seek(0)
     audio_data = audio_buffer.read()
 
-    return await speech_to_text(audio_data)
+    return await speech_to_text.transcribe(audio_data)
 
 
 async def send_response(
-    from_number: str, response_text: str, message_type: str = "text"
+    from_number: str,
+    response_text: str,
+    message_type: str = "text",
+    media_content: bytes = None,
 ) -> bool:
     """Send response to user via WhatsApp API."""
     headers = {
@@ -115,20 +162,26 @@ async def send_response(
         "Content-Type": "application/json",
     }
 
-    if message_type == "audio":
+    if message_type in ["audio", "image"]:
         try:
-            audio_response = await text_to_speech(response_text)
-            media_id = await upload_media(audio_response, "audio/mpeg")
+            mime_type = "audio/mpeg" if message_type == "audio" else "image/png"
+            media_buffer = BytesIO(media_content)
+            media_id = await upload_media(media_buffer, mime_type)
             json_data = {
                 "messaging_product": "whatsapp",
                 "to": from_number,
-                "type": "audio",
-                "audio": {"id": media_id},
+                "type": message_type,
+                message_type: {"id": media_id},
             }
-        except Exception as e:
-            logger.error(f"Audio generation failed, falling back to text: {e}")
 
-    else:  # Text message
+            # Add caption for images
+            if message_type == "image":
+                json_data["image"]["caption"] = response_text
+        except Exception as e:
+            logger.error(f"Media upload failed, falling back to text: {e}")
+            message_type = "text"
+
+    if message_type == "text":
         json_data = {
             "messaging_product": "whatsapp",
             "to": from_number,
@@ -164,43 +217,3 @@ async def upload_media(media_content: BytesIO, mime_type: str) -> str:
     if "id" not in result:
         raise Exception("Failed to upload media")
     return result["id"]
-
-
-async def handle_image_scenario(from_number: str, prompt: str) -> bool:
-    """Generate and send an image scenario via WhatsApp."""
-    try:
-        # Create scenario
-        scenario = await create_scenario(prompt)
-
-        # Generate image
-        image_data = await generate_image(scenario.image_prompt, output_path="")
-
-        # Upload image to WhatsApp
-        media_content = BytesIO(image_data)
-        media_id = await upload_media(media_content, "image/png")
-
-        # Send image with scenario text
-        headers = {
-            "Authorization": f"Bearer {WHATSAPP_TOKEN}",
-            "Content-Type": "application/json",
-        }
-
-        json_data = {
-            "messaging_product": "whatsapp",
-            "to": from_number,
-            "type": "image",
-            "image": {"id": media_id, "caption": scenario.narrative},
-        }
-
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"https://graph.facebook.com/v21.0/{WHATSAPP_PHONE_NUMBER_ID}/messages",
-                headers=headers,
-                json=json_data,
-            )
-
-        return response.status_code == 200
-
-    except Exception as e:
-        logger.error(f"Error in handle_image_scenario: {e}")
-        return False

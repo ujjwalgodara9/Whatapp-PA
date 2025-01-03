@@ -318,5 +318,5 @@ pyrightconfig.json
 # Others
 scratchpad/
 generated_images/
-.chainlit
+.files
 notebooks   

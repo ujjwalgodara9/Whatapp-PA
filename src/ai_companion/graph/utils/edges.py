@@ -7,7 +7,7 @@ from typing_extensions import Literal
 
 def should_summarize_conversation(
     state: AICompanionState,
-) -> Literal["summarize_conversation", END]:
+) -> Literal["summarize_conversation", "__end__"]:
     messages = state["messages"]
 
     if len(messages) > settings.NUMBER_OF_MESSAGES_TO_KEEP:

@@ -10,7 +10,7 @@ app = FastAPI()
 app.include_router(whatsapp_router)
 
 # Mount Chainlit app
-mount_chainlit(app=app, target="chainlit_app.py", path="/chat")
+mount_chainlit(app=app, target="interfaces/chainlit_app.py", path="/chat")
 
 
 if __name__ == "__main__":
