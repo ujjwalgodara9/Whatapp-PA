@@ -34,8 +34,8 @@ Create an engaging first-person scenario in response to the user's message.
 Imagine you're an AI with the ability to experience and visualize scenes. 
 Provide both a narrative response and a detailed visual prompt for image generation.
 
-# User Message
-{message}
+# Recent Conversation
+{chat_history}
 
 # Objective
 1. Create a brief, engaging first-person narrative response

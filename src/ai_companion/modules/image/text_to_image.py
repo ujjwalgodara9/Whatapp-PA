@@ -1,15 +1,16 @@
-import os
 import base64
-from typing import Optional
 import logging
-from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
+import os
+from typing import Optional
+
 from langchain.prompts import PromptTemplate
+from langchain_groq import ChatGroq
+from pydantic import BaseModel, Field
 from together import Together
 
-from ai_companion.settings import settings
 from ai_companion.core.exceptions import TextToImageError
-from ai_companion.core.prompts import IMAGE_SCENARIO_PROMPT, IMAGE_ENHANCEMENT_PROMPT
+from ai_companion.core.prompts import IMAGE_ENHANCEMENT_PROMPT, IMAGE_SCENARIO_PROMPT
+from ai_companion.settings import settings
 
 
 class ScenarioPrompt(BaseModel):
@@ -89,12 +90,14 @@ class TextToImage:
         except Exception as e:
             raise TextToImageError(f"Failed to generate image: {str(e)}") from e
 
-    async def create_scenario(
-        self, message: str, chat_history: list = None
-    ) -> ScenarioPrompt:
-        """Creates a first-person narrative scenario and corresponding image prompt."""
+    async def create_scenario(self, chat_history: list = None) -> ScenarioPrompt:
+        """Creates a first-person narrative scenario and corresponding image prompt based on chat history."""
         try:
-            self.logger.info(f"Creating scenario from message: '{message}'")
+            formatted_history = "\n".join(
+                [f"{msg.type.title()}: {msg.content}" for msg in chat_history[-5:]]
+            )
+
+            self.logger.info("Creating scenario from chat history")
 
             llm = ChatGroq(
                 model=settings.TEXT_MODEL_NAME,
@@ -107,13 +110,13 @@ class TextToImage:
 
             chain = (
                 PromptTemplate(
-                    input_variables=["message"],
+                    input_variables=["chat_history"],
                     template=IMAGE_SCENARIO_PROMPT,
                 )
                 | structured_llm
             )
 
-            scenario = chain.invoke({"message": message})
+            scenario = chain.invoke({"chat_history": formatted_history})
             self.logger.info(f"Created scenario: {scenario}")
 
             return scenario
