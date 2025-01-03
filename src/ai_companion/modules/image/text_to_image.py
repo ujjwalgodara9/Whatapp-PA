@@ -97,7 +97,7 @@ class TextToImage:
             self.logger.info(f"Creating scenario from message: '{message}'")
 
             llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
+                model=settings.TEXT_MODEL_NAME,
                 api_key=settings.GROQ_API_KEY,
                 temperature=0.4,
                 max_retries=2,
@@ -127,7 +127,7 @@ class TextToImage:
             self.logger.info(f"Enhancing prompt: '{prompt}'")
 
             llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
+                model=settings.TEXT_MODEL_NAME,
                 api_key=settings.GROQ_API_KEY,
                 temperature=0.25,
                 max_retries=2,

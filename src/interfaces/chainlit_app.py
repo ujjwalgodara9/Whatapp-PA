@@ -4,16 +4,20 @@ import chainlit as cl
 from langchain_core.messages import AIMessageChunk, HumanMessage
 
 from ai_companion.graph.agent import graph
-from ai_companion.graph.utils.helpers import get_image_to_text_module
-from ai_companion.modules.speech import SpeechToText
-from ai_companion.modules.speech.text_to_speech import TextToSpeech
+from ai_companion.modules.speech import SpeechToText, TextToSpeech
+from ai_companion.modules.image import ImageToText
+
+# Global module instances
+speech_to_text = SpeechToText()
+text_to_speech = TextToSpeech()
+image_to_text = ImageToText()
 
 
 @cl.on_chat_start
 async def on_chat_start():
     """Initialize the chat session"""
-    speech_to_text_module = SpeechToText()
-    cl.user_session.set("speech_to_text", speech_to_text_module)
+    thread_id = cl.user_session.get("id")
+    cl.user_session.set("thread_id", thread_id)
 
 
 @cl.on_message
@@ -24,8 +28,6 @@ async def on_message(message: cl.Message):
     # Process any attached images
     content = message.content
     if message.elements:
-        image_to_text = get_image_to_text_module()
-
         for elem in message.elements:
             if isinstance(elem, cl.Image):
                 # Read image file content
@@ -34,8 +36,9 @@ async def on_message(message: cl.Message):
 
                 # Analyze image and add to message content
                 try:
+                    # Use global ImageToText instance
                     description = await image_to_text.analyze_image(
-                        image_bytes,  # Pass bytes instead of path
+                        image_bytes,
                         "Please describe what you see in this image in the context of our conversation.",
                     )
                     content += f"\n[Image Analysis: {description}]"
@@ -43,10 +46,11 @@ async def on_message(message: cl.Message):
                     cl.logger.warning(f"Failed to analyze image: {e}")
 
     # Process through graph with enriched message content
+    thread_id = cl.user_session.get("thread_id")
     async with cl.Step(type="run"):
         async for chunk in graph.astream(
             {"messages": [HumanMessage(content=content)]},
-            {"configurable": {"thread_id": "1"}},
+            {"configurable": {"thread_id": thread_id}},
             stream_mode="messages",
         ):
             if chunk[1]["langgraph_node"] == "conversation_node" and isinstance(
@@ -54,7 +58,7 @@ async def on_message(message: cl.Message):
             ):
                 await msg.stream_token(chunk[0].content)
 
-    output_state = graph.get_state(config={"configurable": {"thread_id": "1"}})
+    output_state = graph.get_state(config={"configurable": {"thread_id": thread_id}})
 
     if output_state.values.get("workflow") == "audio":
         response = output_state.values["messages"][-1].content
@@ -99,16 +103,17 @@ async def on_audio_end(elements):
         author="You", content="", elements=[input_audio_el, *elements]
     ).send()
 
-    # Convert speech to text
-    speech_to_text = cl.user_session.get("speech_to_text")
+    # Use global SpeechToText instance
     transcription = await speech_to_text.transcribe(audio_data)
 
+    thread_id = cl.user_session.get("thread_id")
     output_state = await graph.ainvoke(
         {"messages": [HumanMessage(content=transcription)]},
-        {"configurable": {"thread_id": "1"}},
+        {"configurable": {"thread_id": thread_id}},
     )
 
-    audio_buffer = await TextToSpeech().synthesize(output_state["messages"][-1].content)
+    # Use global TextToSpeech instance
+    audio_buffer = await text_to_speech.synthesize(output_state["messages"][-1].content)
 
     output_audio_el = cl.Audio(
         name="Audio",
