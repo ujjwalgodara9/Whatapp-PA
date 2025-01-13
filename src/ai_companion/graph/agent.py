@@ -11,7 +11,7 @@ from ai_companion.graph.utils.nodes import (
     conversation_node,
     image_node,
     router_node,
-    summarize_conversation,
+    summarize_conversation_node,
     context_injection_node,
 )
 from ai_companion.graph.utils.state import AICompanionState
@@ -26,13 +26,13 @@ def create_workflow():
     workflow.add_node("conversation_node", conversation_node)
     workflow.add_node("image_node", image_node)
     workflow.add_node("audio_node", audio_node)
-    workflow.add_node("summarize_conversation", summarize_conversation)
+    workflow.add_node("summarize_conversation_node", summarize_conversation_node)
 
     workflow.add_edge(START, "router_node")
     workflow.add_edge("router_node", "context_injection_node")
     workflow.add_conditional_edges("context_injection_node", select_workflow)
     workflow.add_conditional_edges("conversation_node", should_summarize_conversation)
-    workflow.add_edge("summarize_conversation", END)
+    workflow.add_edge("summarize_conversation_node", END)
 
     return workflow
 

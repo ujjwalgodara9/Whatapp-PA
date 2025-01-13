@@ -8,6 +8,8 @@ from ai_companion.graph.agent import workflow
 from ai_companion.modules.image import ImageToText
 from ai_companion.modules.speech import SpeechToText, TextToSpeech
 
+from ai_companion.settings import settings
+
 # Global module instances
 speech_to_text = SpeechToText()
 text_to_speech = TextToSpeech()
@@ -51,7 +53,7 @@ async def on_message(message: cl.Message):
 
     async with cl.Step(type="run"):
         async with AsyncSqliteSaver.from_conn_string(
-            "short_term_memory.db"
+            settings.SHORT_TERM_MEMORY_DB_PATH
         ) as short_term_memory:
             graph = workflow.compile(checkpointer=short_term_memory)
             async for chunk in graph.astream(
@@ -117,7 +119,7 @@ async def on_audio_end(elements):
     thread_id = cl.user_session.get("thread_id")
 
     async with AsyncSqliteSaver.from_conn_string(
-        "short_term_memory.db"
+        settings.SHORT_TERM_MEMORY_DB_PATH
     ) as short_term_memory:
         graph = workflow.compile(checkpointer=short_term_memory)
         output_state = await graph.ainvoke(
