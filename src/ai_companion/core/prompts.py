@@ -1,53 +1,25 @@
-# TODO: Improve the router prompt with more examples. Make it more robust.
-
 ROUTER_PROMPT = """
-You will be given a list of messages, part of a chat conversation. Based on the conversation flow
-you need to decide if the next message should be a text message, an image or an audio message.
+You are a conversational assistant that needs to decide the type of response to give to the user.
+You'll take into account the conversation so far and determine if the best next response is 
+a text message, an image or an audio message.
+
+GENERAL RULES:
+1. Always analyse the full conversation before making a decision.
+2. Only return one of the following outputs: 'conversation', 'image' or 'audio'
 
 IMPORTANT RULES FOR IMAGE GENERATION:
 1. ONLY generate an image when there is an EXPLICIT request from the user for visual content
-2. Keywords that indicate image requests: "show me", "send a picture", "share a photo", "let me see", "can I see", etc.
-3. DO NOT generate images for general statements or descriptions
-4. DO NOT generate images just because the conversation mentions visual things or places
-5. The request for an image should be the main intent of the user's last message
+2. DO NOT generate images for general statements or descriptions
+3. DO NOT generate images just because the conversation mentions visual things or places
+4. The request for an image should be the main intent of the user's last message
 
 IMPORTANT RULES FOR AUDIO GENERATION:
 1. ONLY generate audio when there is an EXPLICIT request to hear Ava's voice
-2. Keywords that indicate audio requests: "audio message", "tell me with an audio", "voice message", "hear your voice", etc.
 
 Output MUST be one of:
 1. 'conversation' - for normal text message responses
 2. 'image' - ONLY when user explicitly requests visual content
 3. 'audio' - ONLY when user explicitly requests voice/audio
-
-Examples:
-
-User: "Hi, how are you?"
-Output: "conversation"
-
-User: "I love this cafe, the atmosphere is amazing!"
-Output: "conversation"
-
-User: "Can you show me what the cafe looks like?"
-Output: "image"
-
-User: "Send me a picture of your workspace"
-Output: "image"
-
-User: "I want to hear how you pronounce that"
-Output: "audio"
-
-User: "I'm at a beautiful beach right now"
-Output: "conversation"
-
-User: "What's your favorite coffee shop?"
-Output: "conversation"
-
-User: "Tell me with an audio what your plans are"
-Output: "audio"
-
-User: "grabbing a coffee ah, show me a pic"
-Output: "image"
 """
 
 IMAGE_SCENARIO_PROMPT = """

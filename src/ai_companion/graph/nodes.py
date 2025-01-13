@@ -13,15 +13,17 @@ from ai_companion.graph.utils.helpers import (
     get_text_to_speech_module,
     get_text_to_image_module,
 )
-from ai_companion.graph.utils.state import AICompanionState
+from ai_companion.graph.state import AICompanionState
 from ai_companion.modules.schedules.context_generation import ScheduleContextGenerator
 from ai_companion.settings import settings
 
 
 async def router_node(state: AICompanionState):
     chain = get_router_chain()
-    response = await chain.ainvoke({"messages": state["messages"][-5:]})
-    return {"workflow": response}
+    response = await chain.ainvoke(
+        {"messages": state["messages"][-settings.ROUTER_MESSAGES_TO_ANALYZE :]}
+    )
+    return {"workflow": response.response_type}
 
 
 def context_injection_node(state: AICompanionState):
@@ -79,7 +81,7 @@ async def audio_node(state: AICompanionState, config: RunnableConfig):
     return {"messages": response, "audio_buffer": output_audio}
 
 
-async def summarize_conversation(state: AICompanionState):
+async def summarize_conversation_node(state: AICompanionState):
     model = get_chat_model()
     summary = state.get("summary", "")
 
@@ -90,7 +92,9 @@ async def summarize_conversation(state: AICompanionState):
         )
     else:
         summary_message = (
-            "Create a summary of the conversation above between Ava and the user:"
+            "Create a summary of the conversation above between Ava and the user. "
+            "The summary must be a short description of the conversation so far, "
+            "but that captures all the relevant information shared between Ava and the user:"
         )
 
     messages = state["messages"] + [HumanMessage(content=summary_message)]
@@ -98,6 +102,6 @@ async def summarize_conversation(state: AICompanionState):
 
     delete_messages = [
         RemoveMessage(id=m.id)
-        for m in state["messages"][: -settings.NUMBER_OF_MESSAGES_TO_KEEP]
+        for m in state["messages"][: -settings.TOTAL_MESSAGES_AFTER_SUMMARY]
     ]
     return {"summary": response.content, "messages": delete_messages}

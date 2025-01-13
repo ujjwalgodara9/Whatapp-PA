@@ -17,8 +17,11 @@ class Settings(BaseSettings):
     TTI_MODEL_NAME: str = "black-forest-labs/FLUX.1-schnell-Free"
     ITT_MODEL_NAME: str = "llama-3.2-90b-vision-preview"
 
-    NUMBER_OF_MESSAGES_TO_KEEP: int = 10
-    TOTAL_MESSAGES_TO_KEEP: int = 20
+    ROUTER_MESSAGES_TO_ANALYZE: int = 3
+    TOTAL_MESSAGES_SUMMARY_TRIGGER: int = 20
+    TOTAL_MESSAGES_AFTER_SUMMARY: int = 5
+
+    SHORT_TERM_MEMORY_DB_PATH: str = "src/ai_companion/modules/memory/short_term/mem.db"
 
 
 settings = Settings()
