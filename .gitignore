@@ -318,5 +318,4 @@ pyrightconfig.json
 # Others
 scratchpad/
 generated_images/
-.files
-notebooks   
+.files   

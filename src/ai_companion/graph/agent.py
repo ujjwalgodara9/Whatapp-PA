@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from ai_companion.graph.utils.edges import (
@@ -18,7 +17,7 @@ from ai_companion.graph.utils.nodes import (
 from ai_companion.graph.utils.state import AICompanionState
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def create_workflow():
     workflow = StateGraph(AICompanionState)
 
@@ -35,10 +34,7 @@ def create_workflow():
     workflow.add_conditional_edges("conversation_node", should_summarize_conversation)
     workflow.add_edge("summarize_conversation", END)
 
-    memory = MemorySaver()
-    graph = workflow.compile(checkpointer=memory)
-
-    return graph
+    return workflow
 
 
-graph = create_workflow()
+workflow = create_workflow()
