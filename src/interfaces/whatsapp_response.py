@@ -7,7 +7,7 @@ import httpx
 from fastapi import APIRouter, Request, Response
 from langchain_core.messages import HumanMessage
 
-from ai_companion.graph.agent import graph
+from ai_companion.graph.graph import graph
 from ai_companion.modules.image import ImageToText
 from ai_companion.modules.speech import SpeechToText
 

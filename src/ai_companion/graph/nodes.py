@@ -13,7 +13,7 @@ from ai_companion.graph.utils.helpers import (
     get_text_to_speech_module,
     get_text_to_image_module,
 )
-from ai_companion.graph.utils.state import AICompanionState
+from ai_companion.graph.state import AICompanionState
 from ai_companion.modules.schedules.context_generation import ScheduleContextGenerator
 from ai_companion.settings import settings
 

@@ -4,7 +4,7 @@ import chainlit as cl
 from langchain_core.messages import AIMessageChunk, HumanMessage
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-from ai_companion.graph.agent import workflow
+from ai_companion.graph import graph_builder
 from ai_companion.modules.image import ImageToText
 from ai_companion.modules.speech import SpeechToText, TextToSpeech
 
@@ -55,7 +55,7 @@ async def on_message(message: cl.Message):
         async with AsyncSqliteSaver.from_conn_string(
             settings.SHORT_TERM_MEMORY_DB_PATH
         ) as short_term_memory:
-            graph = workflow.compile(checkpointer=short_term_memory)
+            graph = graph_builder.compile(checkpointer=short_term_memory)
             async for chunk in graph.astream(
                 {"messages": [HumanMessage(content=content)]},
                 {"configurable": {"thread_id": thread_id}},
@@ -121,7 +121,7 @@ async def on_audio_end(elements):
     async with AsyncSqliteSaver.from_conn_string(
         settings.SHORT_TERM_MEMORY_DB_PATH
     ) as short_term_memory:
-        graph = workflow.compile(checkpointer=short_term_memory)
+        graph = graph_builder.compile(checkpointer=short_term_memory)
         output_state = await graph.ainvoke(
             {"messages": [HumanMessage(content=transcription)]},
             {"configurable": {"thread_id": thread_id}},

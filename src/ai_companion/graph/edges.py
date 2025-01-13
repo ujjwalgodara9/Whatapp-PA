@@ -1,4 +1,4 @@
-from ai_companion.graph.utils.state import AICompanionState
+from ai_companion.graph.state import AICompanionState
 from ai_companion.settings import settings
 
 from langgraph.graph import END
