@@ -11,7 +11,7 @@ def should_summarize_conversation(
     messages = state["messages"]
 
     if len(messages) > settings.TOTAL_MESSAGES_SUMMARY_TRIGGER:
-        return "summarize_conversation"
+        return "summarize_conversation_node"
 
     return END
 
