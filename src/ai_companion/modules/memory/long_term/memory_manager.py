@@ -66,7 +66,6 @@ class MemoryManager:
                 metadata={
                     "id": str(uuid.uuid4()),
                     "timestamp": datetime.now().isoformat(),
-                    "type": "user_info",
                 },
             )
 
