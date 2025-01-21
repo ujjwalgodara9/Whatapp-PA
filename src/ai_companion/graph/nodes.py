@@ -16,6 +16,7 @@ from ai_companion.graph.utils.helpers import (
 from ai_companion.graph.state import AICompanionState
 from ai_companion.modules.schedules.context_generation import ScheduleContextGenerator
 from ai_companion.settings import settings
+from ai_companion.modules.memory.long_term.memory_manager import get_memory_manager
 
 
 async def router_node(state: AICompanionState):
@@ -37,16 +38,25 @@ def context_injection_node(state: AICompanionState):
 
 async def conversation_node(state: AICompanionState, config: RunnableConfig):
     current_activity = ScheduleContextGenerator.get_current_activity()
+    memory_context = state.get("memory_context", "")
+
     chain = get_character_response_chain(state.get("summary", ""))
 
     response = await chain.ainvoke(
-        {"messages": state["messages"], "current_activity": current_activity}, config
+        {
+            "messages": state["messages"],
+            "current_activity": current_activity,
+            "memory_context": memory_context,
+        },
+        config,
     )
     return {"messages": AIMessage(content=response)}
 
 
 async def image_node(state: AICompanionState, config: RunnableConfig):
     current_activity = ScheduleContextGenerator.get_current_activity()
+    memory_context = state.get("memory_context", "")
+
     chain = get_character_response_chain(state.get("summary", ""))
     text_to_image_module = get_text_to_image_module()
 
@@ -62,7 +72,12 @@ async def image_node(state: AICompanionState, config: RunnableConfig):
     updated_messages = state["messages"] + [scenario_message]
 
     response = await chain.ainvoke(
-        {"messages": updated_messages, "current_activity": current_activity}, config
+        {
+            "messages": updated_messages,
+            "current_activity": current_activity,
+            "memory_context": memory_context,
+        },
+        config,
     )
 
     return {"messages": AIMessage(content=response), "image_path": img_path}
@@ -70,11 +85,18 @@ async def image_node(state: AICompanionState, config: RunnableConfig):
 
 async def audio_node(state: AICompanionState, config: RunnableConfig):
     current_activity = ScheduleContextGenerator.get_current_activity()
+    memory_context = state.get("memory_context", "")
+
     chain = get_character_response_chain(state.get("summary", ""))
     text_to_speech_module = get_text_to_speech_module()
 
     response = await chain.ainvoke(
-        {"messages": state["messages"], "current_activity": current_activity}, config
+        {
+            "messages": state["messages"],
+            "current_activity": current_activity,
+            "memory_context": memory_context,
+        },
+        config,
     )
     output_audio = await text_to_speech_module.synthesize(response)
 
@@ -105,3 +127,27 @@ async def summarize_conversation_node(state: AICompanionState):
         for m in state["messages"][: -settings.TOTAL_MESSAGES_AFTER_SUMMARY]
     ]
     return {"summary": response.content, "messages": delete_messages}
+
+
+async def memory_extraction_node(state: AICompanionState):
+    """Extract and store important information from the last message."""
+    if not state["messages"]:
+        return {}
+
+    memory_manager = get_memory_manager()
+    await memory_manager.extract_and_store_memories(state["messages"][-1])
+    return {}
+
+
+def memory_injection_node(state: AICompanionState):
+    """Retrieve and inject relevant memories into the character card."""
+    memory_manager = get_memory_manager()
+
+    # Get relevant memories based on recent conversation
+    recent_context = " ".join([m.content for m in state["messages"][-3:]])
+    memories = memory_manager.get_relevant_memories(recent_context)
+
+    # Format memories for the character card
+    memory_context = memory_manager.format_memories_for_prompt(memories)
+
+    return {"memory_context": memory_context}
