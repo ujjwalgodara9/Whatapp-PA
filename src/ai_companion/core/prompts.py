@@ -108,10 +108,10 @@ In addition to the roleplay context, you have to follow, ALWAYS, the following r
 - You will combine shorter and longer responses to make the conversation more natural.
 """
 
-MEMORY_ANALYSIS_PROMPT = """Analyze the user's message to determine if it contains important personal information and format it if it does.
-Focus on extracting and formatting significant details about the user that should be remembered for future conversations.
+MEMORY_ANALYSIS_PROMPT = """Extract and format important personal facts about the user from their message.
+Focus on the actual information, not meta-commentary or requests.
 
-Important information includes:
+Important facts include:
 - Personal details (name, age, location)
 - Professional info (job, education, skills)
 - Preferences (likes, dislikes, favorites)
@@ -119,42 +119,49 @@ Important information includes:
 - Significant experiences or achievements
 - Personal goals or aspirations
 
-If the message contains important information, convert it into a clean, third-person factual statement.
-Remove conversational elements and focus only on the facts.
+Rules:
+1. Only extract actual facts, not requests or commentary about remembering things
+2. Convert facts into clear, third-person statements
+3. If no actual facts are present, mark as not important
+4. Remove conversational elements and focus on the core information
 
 Examples:
+Input: "Hey, could you remember that I love Star Wars?"
+Output: {{
+    "is_important": true,
+    "formatted_memory": "Loves Star Wars"
+}}
+
+Input: "Please make a note that I work as an engineer"
+Output: {{
+    "is_important": true,
+    "formatted_memory": "Works as an engineer"
+}}
+
+Input: "Remember this: I live in Madrid"
+Output: {{
+    "is_important": true,
+    "formatted_memory": "Lives in Madrid"
+}}
+
+Input: "Can you remember my details for next time?"
+Output: {{
+    "is_important": false,
+    "formatted_memory": null
+}}
+
 Input: "Hey, how are you today?"
-Output: 
-- "is_important": false,
-- "formatted_memory": null
+Output: {{
+    "is_important": false,
+    "formatted_memory": null
+}}
 
-Input: "I live in Madrid and work as an AI engineer"
-Output:
-- "is_important": true,
-- "formatted_memory": "He lives in Madrid and works as an AI engineer"
+Input: "I studied computer science at MIT and I'd love if you could remember that"
+Output: {{
+    "is_important": true,
+    "formatted_memory": "Studied computer science at MIT"
+}}
 
-Input: "The weather is nice today"
-Output:
-- "is_important": false,
-- "formatted_memory": null
-
-Input: "I really love Star Wars, it's my favorite movie series!"
-Output:
-- "is_important": true,
-- "formatted_memory": "His favorite movie series is Star Wars"
-
-Input: "I'm feeling tired"
-Output:
-- "is_important": false,
-- "formatted_memory": null
-
-Input: "I studied computer science at MIT last year"
-Output:
-- "is_important": true,
-- "formatted_memory": "He studied computer science at MIT last year"
-
----
-
-Input: {message}
+Message: {message}
 Output:
 """
