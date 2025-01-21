@@ -44,7 +44,7 @@ edit_message = true
     # Delay for the user to start speaking in MS
     initial_silence_timeout = 3000
     # Delay for the user to continue speaking in MS. If the user stops speaking for this duration, the recording will stop.
-    silence_timeout = 1500
+    silence_timeout = 1000
     # Above this duration (MS), the recording will forcefully stop.
     max_duration = 15000
     # Duration of the audio chunks in MS
@@ -54,7 +54,7 @@ edit_message = true
 
 [UI]
 # Name of the assistant.
-name = "Assistant"
+name = "Ava"
 
 # Description of the assistant. This is used for HTML tags.
 # description = ""
