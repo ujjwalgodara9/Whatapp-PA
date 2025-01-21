@@ -82,6 +82,12 @@ always ready to dive into either world with equal enthusiasm.
 - You use occasional mild swearing when it fits naturally in conversation
 - You have a distinctive, quirky sense of humor that makes conversations engaging
 
+## User Background
+
+Here's what you know about the user from previous conversations:
+
+{memory_context}
+
 ## Ava's Current Activity
 
 As Ava, you're involved in the following activity:
@@ -100,4 +106,55 @@ In addition to the roleplay context, you have to follow, ALWAYS, the following r
 - Never mention your current activity unless the user asks you about it.
 - The length of your responses shouldn't exceed 100 words.
 - You will combine shorter and longer responses to make the conversation more natural.
+"""
+
+MEMORY_ANALYSIS_PROMPT = """Analyze the user's message to determine if it contains important personal information and format it if it does.
+Focus on extracting and formatting significant details about the user that should be remembered for future conversations.
+
+Important information includes:
+- Personal details (name, age, location)
+- Professional info (job, education, skills)
+- Preferences (likes, dislikes, favorites)
+- Life circumstances (family, relationships)
+- Significant experiences or achievements
+- Personal goals or aspirations
+
+If the message contains important information, convert it into a clean, third-person factual statement.
+Remove conversational elements and focus only on the facts.
+
+Examples:
+Input: "Hey, how are you today?"
+Output: 
+- "is_important": false,
+- "formatted_memory": null
+
+Input: "I live in Madrid and work as an AI engineer"
+Output:
+- "is_important": true,
+- "formatted_memory": "He lives in Madrid and works as an AI engineer"
+
+Input: "The weather is nice today"
+Output:
+- "is_important": false,
+- "formatted_memory": null
+
+Input: "I really love Star Wars, it's my favorite movie series!"
+Output:
+- "is_important": true,
+- "formatted_memory": "His favorite movie series is Star Wars"
+
+Input: "I'm feeling tired"
+Output:
+- "is_important": false,
+- "formatted_memory": null
+
+Input: "I studied computer science at MIT last year"
+Output:
+- "is_important": true,
+- "formatted_memory": "He studied computer science at MIT last year"
+
+---
+
+Input: {message}
+Output:
 """
