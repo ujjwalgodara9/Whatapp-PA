@@ -10,23 +10,24 @@
 
 ## Table of Contents
 
-- [1. Course Overview](#course-overview)
-- [2. The tech stack](#the-tech-stack)
-- [2. Course Outline](#course-outline)
-    - [Lesson 0 - Before we begin](#️-lesson-0-before-we-begin)
-    - [Lesson 1 - Project overview](#️-lesson-1-project-overview)    
-    - [Lesson 2 - Ava's brain is just a graph](#️-lesson-2-avas-brain-is-just-a-graph)
-    - [Lesson 3 - Unlocking Ava's memories](#-lesson-3-unlocking-avas-memories)
-    - [Lesson 4 - Giving Ava a Voice](#️-lesson-4-giving-ava-a-voice)
-    - [Lesson 5 - Ava learns to see](#-lesson-5-ava-learns-to-see)
-    - [Lesson 6 - Ava installs Whatsapp](#-lesson-6-ava-installs-whatsapp)
-- [3. Contributors](#contributors)
-- [4. License](#license)
+- [Table of Contents](#table-of-contents)
+- [Course Overview](#course-overview)
+- [The tech stack](#the-tech-stack)
+- [Course Outline](#course-outline)
+  - [🛠️ Lesson 0: Before we begin](#️-lesson-0-before-we-begin)
+  - [🏗️ Lesson 1: Project overview](#️-lesson-1-project-overview)
+  - [🕸️ Lesson 2: Ava's brain is just a graph](#️-lesson-2-avas-brain-is-just-a-graph)
+  - [🧠 Lesson 3: Unlocking Ava's memories](#-lesson-3-unlocking-avas-memories)
+  - [🗣️ Lesson 4: Giving Ava a Voice](#️-lesson-4-giving-ava-a-voice)
+  - [👀 Lesson 5: Ava learns to see](#-lesson-5-ava-learns-to-see)
+  - [📱 Lesson 6: Ava installs Whatsapp](#-lesson-6-ava-installs-whatsapp)
+- [Contributors](#contributors)
+- [License](#license)
 
 ## Course Overview
 
 <p align="center">
-    <img alt="logo" src="img/ex_machina.png" width=400 />
+    <img alt="logo" src="img/ex_machina_faceswap.jpg" width=400 />
 </p>
 
 What happens when [two ML Engineers](#contributors) with a love for sci-fi movies team up? 🤔
@@ -132,9 +133,9 @@ WIP 👷
     <td><img src="https://github.com/jesuscopado.png" width="100" style="border-radius:50%;"/></td>
     <td>
       <strong>Jesús Copado | Senior ML / AI Engineer </strong><br />
-      <i>Created "Her". Agentic lover and Youtuber.</i><br /><br />
+      <i>Equal parts cinema fan and AI enthusiast.</i><br /><br />
+      <a href="https://www.youtube.com/@jesuscopado-en">YouTube</a><br />
       <a href="https://www.linkedin.com/in/copadojesus/">LinkedIn</a><br />
-      <a href="https://www.youtube.com/@jesuscopado-en">YouTube</a>
     </td>
   </tr>
 </table>
