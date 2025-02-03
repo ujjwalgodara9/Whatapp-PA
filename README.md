@@ -64,8 +64,8 @@ Excited? Let's get started!
     <td>Serving as the long-term database, enabling our agent to recall details you shared months ago.</td>
   </tr>
   <tr>
-    <td><img src="img/beam_logo.png" width="100" alt="Beam Logo"/></td>
-    <td>A cost-effective, serverless solution to bring everything into production.</td>
+    <td><img src="img/cloud_run_logo.png" width="100" alt="Cloud Run Logo"/></td>
+    <td>Deploying your containers easily to Google Cloud Platform</td>
   </tr>
   <tr>
     <td><img src="img/langgraph_logo.png" width="100" alt="LangGraph Logo"/></td>
