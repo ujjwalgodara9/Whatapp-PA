@@ -91,6 +91,7 @@ These two versions are complementaty, so we recommend you to go through both, as
 
 > WIP ... 👷
 
+
 ### 🏗️ Lesson 1: Project overview
 
 > WIP ... 👷
