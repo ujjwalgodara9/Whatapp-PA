@@ -6,24 +6,27 @@ from typing import Dict
 import httpx
 from fastapi import APIRouter, Request, Response
 from langchain_core.messages import HumanMessage
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-from ai_companion.graph.graph import graph
+from ai_companion.graph import graph_builder
 from ai_companion.modules.image import ImageToText
-from ai_companion.modules.speech import SpeechToText
+from ai_companion.modules.speech import SpeechToText, TextToSpeech
 
-# Configure logger
+from ai_companion.settings import settings
+
 logger = logging.getLogger(__name__)
 
-# Router for WhatsApp response
+# Global module instances
+speech_to_text = SpeechToText()
+text_to_speech = TextToSpeech()
+image_to_text = ImageToText()
+
+# Router for WhatsApp respo
 whatsapp_router = APIRouter()
 
 # WhatsApp API credentials
 WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
-
-# Initialize modules
-image_to_text = ImageToText()
-speech_to_text = SpeechToText()
 
 
 @whatsapp_router.api_route("/whatsapp_response", methods=["GET", "POST"])
@@ -65,15 +68,20 @@ async def whatsapp_handler(request: Request) -> Response:
                 content = message["text"]["body"]
 
             # Process message through the graph agent
-            await graph.ainvoke(
-                {"messages": [HumanMessage(content=content)]},
-                {"configurable": {"thread_id": session_id}},
-            )
+            async with AsyncSqliteSaver.from_conn_string(
+                settings.SHORT_TERM_MEMORY_DB_PATH
+            ) as short_term_memory:
+                graph = graph_builder.compile(checkpointer=short_term_memory)
+                await graph.ainvoke(
+                    {"messages": [HumanMessage(content=content)]},
+                    {"configurable": {"thread_id": session_id}},
+                )
 
-            # Get the workflow type and response from the state
-            output_state = graph.get_state(
-                config={"configurable": {"thread_id": session_id}}
-            )
+                # Get the workflow type and response from the state
+                output_state = await graph.aget_state(
+                    config={"configurable": {"thread_id": session_id}}
+                )
+
             workflow = output_state.values.get("workflow", "conversation")
             response_message = output_state.values["messages"][-1].content
 
@@ -188,6 +196,9 @@ async def send_response(
             "type": "text",
             "text": {"body": response_text},
         }
+
+    print(headers)
+    print(json_data)
 
     async with httpx.AsyncClient() as client:
         response = await client.post(

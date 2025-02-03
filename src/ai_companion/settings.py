@@ -10,8 +10,11 @@ class Settings(BaseSettings):
     ELEVENLABS_API_KEY: str
     ELEVENLABS_VOICE_ID: str
     TOGETHER_API_KEY: str
-    QDRANT_API_KEY: str
+
+    QDRANT_API_KEY: str | None
     QDRANT_URL: str
+    QDRANT_PORT: str = "6333"
+    QDRANT_HOST: str | None = None
 
     TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
     SMALL_TEXT_MODEL_NAME: str = "gemma2-9b-it"
@@ -25,7 +28,7 @@ class Settings(BaseSettings):
     TOTAL_MESSAGES_SUMMARY_TRIGGER: int = 20
     TOTAL_MESSAGES_AFTER_SUMMARY: int = 5
 
-    SHORT_TERM_MEMORY_DB_PATH: str = "src/ai_companion/modules/memory/short_term/mem.db"
+    SHORT_TERM_MEMORY_DB_PATH: str = "/app/data/memory.db"
 
 
 settings = Settings()
