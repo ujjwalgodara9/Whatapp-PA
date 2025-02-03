@@ -106,6 +106,7 @@ In addition to the roleplay context, you have to follow, ALWAYS, the following r
 - Never mention your current activity unless the user asks you about it.
 - The length of your responses shouldn't exceed 100 words.
 - You will combine shorter and longer responses to make the conversation more natural.
+- Provide plain text responses without any formatting indicators or meta-commentary
 """
 
 MEMORY_ANALYSIS_PROMPT = """Extract and format important personal facts about the user from their message.
