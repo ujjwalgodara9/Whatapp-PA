@@ -90,12 +90,20 @@ These two versions are complementaty, so we recommend you to go through both, as
 
 ### 🛠️ Lesson 0: Before we begin
 
-> WIP ... 👷
+This project uses a lot of services and tools, so we need to get everything ready before we start. Follow the instructions in [this document](docs/before_we_begin.md).
 
 
 ### 🏗️ Lesson 1: Project overview
 
-> WIP ... 👷
+The first lesson is about getting to know the project and its general structure. 
+
+> 🔗 Article ✨ [Meet Ava - The WhatsApp Agent](https://open.substack.com/pub/theneuralmaze/p/meet-ava-the-whatsapp-agent?r=1hkexh&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true)
+
+<div align="center">
+  <a href="https://youtu.be/u5y06cFK2WA?si=RCx__sJNtr2DYf0U">
+    <img src="https://img.youtube.com/vi/u5y06cFK2WA/0.jpg" alt="Watch the video" />
+  </a>
+</div>
 
 ### 🕸️ Lesson 2: Ava's brain is just a graph
 
