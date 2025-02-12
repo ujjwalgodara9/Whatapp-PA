@@ -103,7 +103,7 @@ The first lesson is about getting to know the project and its general structure.
 
 <div align="center">
   <a href="https://youtu.be/u5y06cFK2WA?si=RCx__sJNtr2DYf0U">
-    <img src="https://img.youtube.com/vi/u5y06cFK2WA/0.jpg" alt="Watch the video" />
+    <img src="img/video_thumbnails/thumbnail_1_play.png" alt="Watch the video" width=400/>
   </a>
 </div>
 
@@ -112,6 +112,12 @@ The first lesson is about getting to know the project and its general structure.
 Date: **2025-02-12**
 
 > WIP ... 👷
+
+<div align="center">
+  <a href="https://youtu.be/nTsLL3htkCU?si=aSmSkpL-U3rzw9Za">
+    <img src="img/video_thumbnails/thumbnail_2_play.png" alt="Watch the video" width=400/>
+  </a>
+</div>
 
 ### 🧠 Lesson 3: Unlocking Ava's memories
         
