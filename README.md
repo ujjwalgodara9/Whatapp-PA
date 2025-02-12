@@ -16,7 +16,7 @@
 - [Course Outline](#course-outline)
   - [🛠️ Lesson 0: Before we begin](#️-lesson-0-before-we-begin)
   - [🏗️ Lesson 1: Project overview](#️-lesson-1-project-overview)
-  - [🕸️ Lesson 2: Ava's brain is just a graph](#️-lesson-2-avas-brain-is-just-a-graph)
+  - [🕸️ Lesson 2: Dissecting Ava's brain](#️-lesson-2-dissecting-avas-brain)
   - [🧠 Lesson 3: Unlocking Ava's memories](#-lesson-3-unlocking-avas-memories)
   - [🗣️ Lesson 4: Giving Ava a Voice](#️-lesson-4-giving-ava-a-voice)
   - [👀 Lesson 5: Ava learns to see](#-lesson-5-ava-learns-to-see)
@@ -97,6 +97,10 @@ This project uses a lot of services and tools, so we need to get everything read
 
 Date: **2025-02-05**
 
+<p align="center">
+        <img alt="lesson1" src="img/lesson1.png" width=400 />
+</p>
+
 The first lesson is about getting to know the project and its general structure. 
 
 > 🔗 Article ✨ [Meet Ava - The WhatsApp Agent](https://theneuralmaze.substack.com/p/meet-ava-the-whatsapp-agent)
@@ -107,11 +111,17 @@ The first lesson is about getting to know the project and its general structure.
   </a>
 </div>
 
-### 🕸️ Lesson 2: Ava's brain is just a graph
+### 🕸️ Lesson 2: Dissecting Ava's brain
 
 Date: **2025-02-12**
 
-> WIP ... 👷
+<p align="center">
+        <img alt="lesson2" src="img/lesson2.png" width=400 />
+</p>
+
+Lesson 2 is about LangGraph. Simple as that. You'll learn about graphs, state, nodes and edges and understand how Ava's "brain" actually works.
+
+> 🔗 Article ✨ [Dissecting Ava's brain](https://theneuralmaze.substack.com/p/dissecting-avas-brain)
 
 <div align="center">
   <a href="https://youtu.be/nTsLL3htkCU?si=aSmSkpL-U3rzw9Za">
