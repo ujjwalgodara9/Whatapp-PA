@@ -135,11 +135,23 @@ Lesson 2 is about LangGraph. Simple as that. You'll learn about graphs, state, n
 
 ---
 
-### 🧠 Lesson 3: Unlocking Ava's memories
+### [🧠 Lesson 3: Unlocking Ava's memories](https://theneuralmaze.substack.com/p/can-agents-get-nostalgic-about-the)
         
 Date: **2025-02-19**
 
-> WIP ... 👷
+<p align="center">
+        <img alt="lesson3" src="img/lesson3.png" width=400 />
+</p>
+
+In Lesson 3, we will explore Ava's memory system, both the short-term memory (Sqlite) and the long-term memory (Qdrant).
+
+> 🔗 Article ✨ [Unlocking Ava's memories](https://theneuralmaze.substack.com/p/can-agents-get-nostalgic-about-the)
+
+<div align="center">
+  <a href="https://youtu.be/oTHqYEpdFXg?si=MXEvjUJ8Xbc6h9l2">
+    <img src="img/video_thumbnails/thumbsnail_3_play.jpg" alt="Watch the video" width=400/>
+  </a>
+</div>
 
 ---
 
