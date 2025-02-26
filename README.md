@@ -155,11 +155,18 @@ In Lesson 3, we will explore Ava's memory system, both the short-term memory (Sq
 
 ---
 
-### 🗣️ Lesson 4: Giving Ava a Voice
+### [🗣️ Lesson 4: Giving Ava a Voice](https://theneuralmaze.substack.com/p/the-ultimate-ai-voice-pipeline)
 
 Date: **2025-02-26**
 
-> WIP ... 👷
+<p align="center">
+        <img alt="lesson4" src="img/lesson4.png" width=400 />
+</p>
+
+In Lesson 4, we'll explore Ava's Voice pipeline, breakind down the two key systems: STT (speech-to-text) and TTS (text-to-speech).
+
+> 🔗 Article ✨ [Given Ava a voice](https://theneuralmaze.substack.com/p/the-ultimate-ai-voice-pipeline)
+
 
 <div align="center">
   <a href="https://youtu.be/RNmwvMjtIt0">
