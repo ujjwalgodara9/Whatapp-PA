@@ -1,7 +1,7 @@
 <p align="center">
         <img alt="logo" src="img/project_overview_diagram.gif" width=600 />
     <h1 align="center">📱 Ava 📱</h1>
-    <h3 align="center">Turning the Turing Test into a Whatsapp Agent</h3>
+    <h3 align="center">Turning the Turing Test into a WhatsApp Agent</h3>
 </p>
 
 <p align="center">
