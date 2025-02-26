@@ -163,7 +163,7 @@ Date: **2025-02-26**
         <img alt="lesson4" src="img/lesson4.png" width=400 />
 </p>
 
-In Lesson 4, we'll explore Ava's Voice pipeline, breakind down the two key systems: STT (speech-to-text) and TTS (text-to-speech).
+In Lesson 4, we'll explore Ava's Voice pipeline, breaking down the two key systems: STT (speech-to-text) and TTS (text-to-speech).
 
 > 🔗 Article ✨ [Given Ava a voice](https://theneuralmaze.substack.com/p/the-ultimate-ai-voice-pipeline)
 
