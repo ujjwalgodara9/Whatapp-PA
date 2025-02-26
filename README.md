@@ -149,7 +149,7 @@ In Lesson 3, we will explore Ava's memory system, both the short-term memory (Sq
 
 <div align="center">
   <a href="https://youtu.be/oTHqYEpdFXg?si=MXEvjUJ8Xbc6h9l2">
-    <img src="img/video_thumbnails/thumbsnail_3_play.png" alt="Watch the video" width=400/>
+    <img src="img/video_thumbnails/thumbnail_3_play.png" alt="Watch the video" width=400/>
   </a>
 </div>
 
@@ -163,7 +163,7 @@ Date: **2025-02-26**
 
 <div align="center">
   <a href="https://youtu.be/RNmwvMjtIt0">
-    <img src="img/video_thumbnails/thumbsnail_4_play.png" alt="Watch the video" width=400/>
+    <img src="img/video_thumbnails/thumbnail_4_play.png" alt="Watch the video" width=400/>
   </a>
 </div>
 
