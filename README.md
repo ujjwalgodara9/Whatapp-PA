@@ -165,7 +165,7 @@ Date: **2025-02-26**
 
 In Lesson 4, we'll explore Ava's Voice pipeline, breaking down the two key systems: STT (speech-to-text) and TTS (text-to-speech).
 
-> 🔗 Article ✨ [Given Ava a voice](https://theneuralmaze.substack.com/p/the-ultimate-ai-voice-pipeline)
+> 🔗 Article ✨ [Giving Ava a voice](https://theneuralmaze.substack.com/p/the-ultimate-ai-voice-pipeline)
 
 
 <div align="center">
@@ -176,11 +176,17 @@ In Lesson 4, we'll explore Ava's Voice pipeline, breaking down the two key syste
 
 ---
 
-### 👀 Lesson 5: Ava learns to see
+### [👀 Lesson 5: Ava learns to see](https://theneuralmaze.substack.com/p/reading-images-drawing-dreams-vlms)
 
 Date: **2025-03-05**
 
-> WIP ... 👷
+<p align="center">
+        <img alt="lesson5" src="img/lesson5.png" width=400 />
+</p>
+
+In Lesson 5, we'll explore Ava's Vision pipeline, breaking down the two main components: VLMs for image description / understanding and Diffusion Models for image generation.
+
+> 🔗 Article ✨ [Ava learns to see](https://theneuralmaze.substack.com/p/reading-images-drawing-dreams-vlms)
 
 <div align="center">
   <a href="https://youtu.be/LS7k-XFBbeo">
