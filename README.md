@@ -182,6 +182,12 @@ Date: **2025-03-05**
 
 > WIP ... 👷
 
+<div align="center">
+  <a href="https://youtu.be/LS7k-XFBbeo">
+    <img src="img/video_thumbnails/thumbnail_5_play.png" alt="Watch the video" width=400/>
+  </a>
+</div>
+
 ---
 
 ### 📱 Lesson 6: Ava installs Whatsapp
