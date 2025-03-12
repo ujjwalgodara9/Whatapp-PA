@@ -202,6 +202,12 @@ Date: **2025-03-12**
 
 > WIP ... 👷
 
+<div align="center">
+  <a href="https://youtu.be/dFsI4lnUkKo">
+    <img src="img/video_thumbnails/thumbnail_6_play.png" alt="Watch the video" width=400/>
+  </a>
+</div>
+
 ---
 
 ## Contributors
