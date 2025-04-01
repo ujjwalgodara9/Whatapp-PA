@@ -10,11 +10,13 @@
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Course Overview](#course-overview)
 - [Who is this course for?](#who-is-this-course-for)
 - [What you'll get out of this course](#what-youll-get-out-of-this-course)
-- [Course syllabus](#course-syllabus)
 - [Getting started](#getting-started)
+- [Course syllabus](#course-syllabus)
+- [How much is this going to cost me?](#how-much-is-this-going-to-cost-me)
 - [The tech stack](#the-tech-stack)
 - [Contributors](#contributors)
 - [License](#license)
@@ -55,8 +57,7 @@ Excited? Let's get started!
     <td width="80%" style="border: none;">
       <div>
         <h2>📬 Stay Updated</h2>
-        <p><b><a href="https://theneuralmaze.substack.com/">Join The Neural Maze</a></b> and learn to build AI Systems that actually work, from principles to production. Every Wednesday, directly to your inbox. Don't miss out!
-</p>
+        <p><b><a href="https://theneuralmaze.substack.com/">Join The Neural Maze</a></b> and learn to build AI Systems that actually work, from principles to production. Every Wednesday, directly to your inbox. Don't miss out!</p>
       </div>
     </td>
   </tr>
@@ -65,6 +66,30 @@ Excited? Let's get started!
 <p align="center">
   <a href="https://theneuralmaze.substack.com/">
     <img src="https://img.shields.io/static/v1?label&logo=substack&message=Subscribe Now&style=for-the-badge&color=black&scale=2" alt="Subscribe Now" height="40">
+  </a>
+</p>
+
+---
+
+<table style="border-collapse: collapse; border: none;">
+  <tr style="border: none;">
+    <td width="20%" style="border: none;">
+      <a href="https://www.youtube.com/@jesuscopado-en" aria-label="Jesus Copado YouTube Channel">
+        <img src="img/jesus_youtube_channel.png" alt="Jesus Copado YouTube Channel" width="150"/>
+      </a>
+    </td>
+    <td width="80%" style="border: none;">
+      <div>
+        <h2>🎥 Watch More Content</h2>
+        <p><b><a href="https://www.youtube.com/@jesuscopado-en">Join Jesús Copado on YouTube</a></b> to explore how to build real AI projects—from voice agents to creative tools. Weekly videos with code, demos, and ideas that push what's possible with AI. Don't miss the next drop!</p>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="https://www.youtube.com/@jesuscopado-en">
+    <img src="https://img.shields.io/static/v1?label&logo=youtube&message=Subscribe Now&style=for-the-badge&color=FF0000&scale=2" alt="Subscribe Now" height="40">
   </a>
 </p>
 
@@ -195,8 +220,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <td width="80%" style="border: none;">
       <div>
         <h2>📬 Stay Updated</h2>
-        <p><b><a href="https://theneuralmaze.substack.com/">Join The Neural Maze</a></b> and learn to build AI Systems that actually work, from principles to production. Every Wednesday, directly to your inbox. Don't miss out!
-</p>
+        <p><b><a href="https://theneuralmaze.substack.com/">Join The Neural Maze</a></b> and learn to build AI Systems that actually work, from principles to production. Every Wednesday, directly to your inbox. Don't miss out!</p>
       </div>
     </td>
   </tr>
@@ -205,5 +229,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <p align="center">
   <a href="https://theneuralmaze.substack.com/">
     <img src="https://img.shields.io/static/v1?label&logo=substack&message=Subscribe Now&style=for-the-badge&color=black&scale=2" alt="Subscribe Now" height="40">
+  </a>
+</p>
+
+---
+
+<table style="border-collapse: collapse; border: none;">
+  <tr style="border: none;">
+    <td width="20%" style="border: none;">
+      <a href="https://www.youtube.com/@jesuscopado-en" aria-label="Jesus Copado YouTube Channel">
+        <img src="img/jesus_youtube_channel.png" alt="Jesus Copado YouTube Channel" width="150"/>
+      </a>
+    </td>
+    <td width="80%" style="border: none;">
+      <div>
+        <h2>🎥 Watch More Content</h2>
+        <p><b><a href="https://www.youtube.com/@jesuscopado-en">Join Jesús Copado on YouTube</a></b> to explore how to build real AI projects—from voice agents to creative tools. Weekly videos with code, demos, and ideas that push what's possible with AI. Don't miss the next drop!</p>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="https://www.youtube.com/@jesuscopado-en">
+    <img src="https://img.shields.io/static/v1?label&logo=youtube&message=Subscribe Now&style=for-the-badge&color=FF0000&scale=2" alt="Subscribe Now" height="40">
   </a>
 </p>
