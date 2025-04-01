@@ -69,8 +69,6 @@ Excited? Let's get started!
   </a>
 </p>
 
----
-
 <table style="border-collapse: collapse; border: none;">
   <tr style="border: none;">
     <td width="20%" style="border: none;">
@@ -231,8 +229,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <img src="https://img.shields.io/static/v1?label&logo=substack&message=Subscribe Now&style=for-the-badge&color=black&scale=2" alt="Subscribe Now" height="40">
   </a>
 </p>
-
----
 
 <table style="border-collapse: collapse; border: none;">
   <tr style="border: none;">
