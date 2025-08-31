@@ -2,23 +2,26 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    OPENAI_API_KEY: str | None = None
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_file_encoding="utf-8")
 
     GROQ_API_KEY: str
     ELEVENLABS_API_KEY: str
     ELEVENLABS_VOICE_ID: str
-    TOGETHER_API_KEY: str
+    TOGETHER_API_KEY: str | None = None
 
     QDRANT_API_KEY: str | None
     QDRANT_URL: str
     QDRANT_PORT: str = "6333"
     QDRANT_HOST: str | None = None
 
-    TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
+    # TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
+    TEXT_MODEL_NAME: str = "llama3-70b-8192"
     SMALL_TEXT_MODEL_NAME: str = "gemma2-9b-it"
     STT_MODEL_NAME: str = "whisper-large-v3-turbo"
     TTS_MODEL_NAME: str = "eleven_flash_v2_5"
-    TTI_MODEL_NAME: str = "black-forest-labs/FLUX.1-schnell-Free"
+    # TTI_MODEL_NAME: str = "black-forest-labs/FLUX.1-schnell-Free"
+    TTI_MODEL_NAME: str = "dall-e-3"
     ITT_MODEL_NAME: str = "llama-3.2-90b-vision-preview"
 
     MEMORY_TOP_K: int = 3

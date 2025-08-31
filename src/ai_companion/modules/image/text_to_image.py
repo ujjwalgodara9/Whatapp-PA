@@ -9,8 +9,7 @@ from ai_companion.settings import settings
 from langchain.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
-from together import Together
-
+from openai import OpenAI  # Import the OpenAI client
 
 class ScenarioPrompt(BaseModel):
     """Class for the scenario response"""
@@ -29,14 +28,14 @@ class EnhancedPrompt(BaseModel):
 
 
 class TextToImage:
-    """A class to handle text-to-image generation using Together AI."""
+    """A class to handle text-to-image generation using OpenAI."""
 
-    REQUIRED_ENV_VARS = ["GROQ_API_KEY", "TOGETHER_API_KEY"]
+    REQUIRED_ENV_VARS = ["GROQ_API_KEY", "OPENAI_API_KEY"]
 
     def __init__(self):
         """Initialize the TextToImage class and validate environment variables."""
         self._validate_env_vars()
-        self._together_client: Optional[Together] = None
+        self._openai_client: Optional[OpenAI] = None
         self.logger = logging.getLogger(__name__)
 
     def _validate_env_vars(self) -> None:
@@ -46,28 +45,28 @@ class TextToImage:
             raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
     @property
-    def together_client(self) -> Together:
-        """Get or create Together client instance using singleton pattern."""
-        if self._together_client is None:
-            self._together_client = Together(api_key=settings.TOGETHER_API_KEY)
-        return self._together_client
+    def openai_client(self) -> OpenAI:
+        """Get or create OpenAI client instance using singleton pattern."""
+        if self._openai_client is None:
+            # The client will automatically look for the OPENAI_API_KEY environment variable.
+            self._openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        return self._openai_client
 
     async def generate_image(self, prompt: str, output_path: str = "") -> bytes:
-        """Generate an image from a prompt using Together AI."""
+        """Generate an image from a prompt using OpenAI's DALL-E."""
         if not prompt.strip():
             raise ValueError("Prompt cannot be empty")
 
         try:
             self.logger.info(f"Generating image for prompt: '{prompt}'")
 
-            response = self.together_client.images.generate(
+            response = self.openai_client.images.generate(
+                model="dall-e-3",  # Specify the DALL-E model
                 prompt=prompt,
-                model=settings.TTI_MODEL_NAME,
-                width=1024,
-                height=768,
-                steps=4,
+                size="1024x1024",  # DALL-E 3 supports specific sizes
+                quality="standard",
                 n=1,
-                response_format="b64_json",
+                response_format="b64_json", # Use b64_json to get base64 encoded data
             )
 
             image_data = base64.b64decode(response.data[0].b64_json)
@@ -84,7 +83,6 @@ class TextToImage:
             raise TextToImageError(f"Failed to generate image: {str(e)}") from e
 
     async def create_scenario(self, chat_history: list = None) -> ScenarioPrompt:
-        """Creates a first-person narrative scenario and corresponding image prompt based on chat history."""
         try:
             formatted_history = "\n".join([f"{msg.type.title()}: {msg.content}" for msg in chat_history[-5:]])
 
@@ -116,7 +114,6 @@ class TextToImage:
             raise TextToImageError(f"Failed to create scenario: {str(e)}") from e
 
     async def enhance_prompt(self, prompt: str) -> str:
-        """Enhance a simple prompt with additional details and context."""
         try:
             self.logger.info(f"Enhancing prompt: '{prompt}'")
 
