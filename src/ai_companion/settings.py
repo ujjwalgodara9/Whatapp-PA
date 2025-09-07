@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     QDRANT_HOST: str | None = None
 
     # TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
-    TEXT_MODEL_NAME: str = "llama3-70b-8192"
+    TEXT_MODEL_NAME: str = "llama-3.1-405b"
     SMALL_TEXT_MODEL_NAME: str = "gemma2-9b-it"
     STT_MODEL_NAME: str = "whisper-large-v3-turbo"
     TTS_MODEL_NAME: str = "eleven_flash_v2_5"
