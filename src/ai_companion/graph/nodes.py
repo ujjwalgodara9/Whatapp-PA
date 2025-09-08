@@ -1,5 +1,7 @@
 import os
 from uuid import uuid4
+from ai_companion.modules.mcp_logic.mcp_executor import run_mcp_task
+import asyncio
 
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langchain_core.runnables import RunnableConfig
@@ -144,3 +146,16 @@ def memory_injection_node(state: AICompanionState):
     memory_context = memory_manager.format_memories_for_prompt(memories)
 
     return {"memory_context": memory_context}
+
+from langchain_core.messages import AIMessage
+
+async def mcp_node(state: AICompanionState):
+    """
+    Executes MCP tasks like Playwright browsing.
+    """
+    last_message = state["messages"][-1].content if state["messages"] else ""
+    result = await run_mcp_task(last_message)
+
+    return {"messages": AIMessage(content=result)}
+
+

@@ -2,4 +2,8 @@
     "terminal.integrated.env.osx": {
         "PYTHONPATH": "${workspaceFolder}/src"
     },
+    "python.analysis.extraPaths": [
+        "./src/ai_companion",
+        "./src/ai_companion/modules/mcp_logic"
+    ],
 }

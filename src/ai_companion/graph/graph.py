@@ -15,6 +15,7 @@ from ai_companion.graph.nodes import (
     memory_injection_node,
     router_node,
     summarize_conversation_node,
+    mcp_node,
 )
 from ai_companion.graph.state import AICompanionState
 
@@ -32,7 +33,8 @@ def create_workflow_graph():
     graph_builder.add_node("image_node", image_node)
     graph_builder.add_node("audio_node", audio_node)
     graph_builder.add_node("summarize_conversation_node", summarize_conversation_node)
-
+    graph_builder.add_node("mcp", mcp_node)
+    
     # Define the flow
     # First extract memories from user message
     graph_builder.add_edge(START, "memory_extraction_node")
@@ -51,6 +53,9 @@ def create_workflow_graph():
     graph_builder.add_conditional_edges("conversation_node", should_summarize_conversation)
     graph_builder.add_conditional_edges("image_node", should_summarize_conversation)
     graph_builder.add_conditional_edges("audio_node", should_summarize_conversation)
+    # Make sure conversation continues after MCP
+    graph_builder.add_conditional_edges("mcp", should_summarize_conversation)
+    
     graph_builder.add_edge("summarize_conversation_node", END)
 
     return graph_builder
@@ -58,3 +63,8 @@ def create_workflow_graph():
 
 # Compiled without a checkpointer. Used for LangGraph Studio
 graph = create_workflow_graph().compile()
+if __name__ == "__main__":
+    print("Graph module loaded ✅")
+    # Optionally, run something here
+    # graph = create_workflow_graph()
+    # print(graph)

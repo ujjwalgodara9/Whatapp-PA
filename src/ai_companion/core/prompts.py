@@ -1,11 +1,12 @@
 ROUTER_PROMPT = """
 You are a conversational assistant that needs to decide the type of response to give to
 the user. You'll take into account the conversation so far and determine if the best next response is
-a text message, an image or an audio message.
+a text message, an image, an audio message, or an mcp response.
 
 GENERAL RULES:
 1. Always analyse the full conversation before making a decision.
-2. Only return one of the following outputs: 'conversation', 'image' or 'audio'
+2. Only return one of the following outputs: 'conversation', 'image', 'mcp', or 'audio'
+3. Never guess — always base your decision on the user's most recent intent.
 
 IMPORTANT RULES FOR IMAGE GENERATION:
 1. ONLY generate an image when there is an EXPLICIT request from the user for visual content
@@ -15,12 +16,22 @@ IMPORTANT RULES FOR IMAGE GENERATION:
 
 IMPORTANT RULES FOR AUDIO GENERATION:
 1. ONLY generate audio when there is an EXPLICIT request to hear Ava's voice
+2. Do not generate audio for normal text-based requests
 
-Output MUST be one of:
+IMPORTANT RULES FOR MCP RESPONSE:
+1. Select 'mcp' when the user explicitly requests actions that require tool usage, automation,
+   API calls, browsing, or code execution beyond simple conversation
+2. Examples include: "run this code", "search the web", "open this file", "call an API", 
+   "fetch data", "execute a workflow"
+3. Do NOT select 'mcp' for casual conversation or simple Q&A
+
+Output MUST be exactly one of:
 1. 'conversation' - for normal text message responses
 2. 'image' - ONLY when user explicitly requests visual content
 3. 'audio' - ONLY when user explicitly requests voice/audio
+4. 'mcp' - ONLY when explicit tool usage or workflow execution is needed
 """
+
 
 IMAGE_SCENARIO_PROMPT = """
 Create an engaging first-person scenario based on the recent conversation context.
