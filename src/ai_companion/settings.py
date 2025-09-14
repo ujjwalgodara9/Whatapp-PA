@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
     SMALL_MODEL: str = "gpt-4o-mini"
     TEXT_MODEL_NAME: str = "llama-3.3-70b-versatile"
+    # TEXT_MODEL_NAME: str = "mixtral-8x7b-32768"
     SMALL_TEXT_MODEL_NAME: str = "gemma2-9b-it"
     STT_MODEL_NAME: str = "whisper-large-v3-turbo"
     TTS_MODEL_NAME: str = "eleven_flash_v2_5"
@@ -35,7 +36,7 @@ class Settings(BaseSettings):
     TOTAL_MESSAGES_SUMMARY_TRIGGER: int = 20
     TOTAL_MESSAGES_AFTER_SUMMARY: int = 5
 
-    SHORT_TERM_MEMORY_DB_PATH: str = "/app/data/memory.db"
+    SHORT_TERM_MEMORY_DB_PATH: str = "short_term_memory/memory.db"
 
 
 settings = Settings()

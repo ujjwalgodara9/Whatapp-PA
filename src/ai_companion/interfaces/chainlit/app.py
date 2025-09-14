@@ -2,7 +2,7 @@ from io import BytesIO
 
 import chainlit as cl
 from langchain_core.messages import AIMessageChunk, HumanMessage
-from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from langgraph.checkpoint.memory import MemorySaver
 
 from ai_companion.graph import graph_builder
 from ai_companion.modules.image import ImageToText
@@ -51,17 +51,17 @@ async def on_message(message: cl.Message):
     thread_id = cl.user_session.get("thread_id")
 
     async with cl.Step(type="run"):
-        async with AsyncSqliteSaver.from_conn_string(settings.SHORT_TERM_MEMORY_DB_PATH) as short_term_memory:
-            graph = graph_builder.compile(checkpointer=short_term_memory)
-            async for chunk in graph.astream(
-                {"messages": [HumanMessage(content=content)]},
-                {"configurable": {"thread_id": thread_id}},
-                stream_mode="messages",
-            ):
-                if chunk[1]["langgraph_node"] == "conversation_node" and isinstance(chunk[0], AIMessageChunk):
-                    await msg.stream_token(chunk[0].content)
+        short_term_memory = MemorySaver()
+        graph = graph_builder.compile(checkpointer=short_term_memory)
+        async for chunk in graph.astream(
+            {"messages": [HumanMessage(content=content)]},
+            {"configurable": {"thread_id": thread_id}},
+            stream_mode="messages",
+        ):
+            if chunk[1]["langgraph_node"] == "conversation_node" and isinstance(chunk[0], AIMessageChunk):
+                await msg.stream_token(chunk[0].content)
 
-            output_state = await graph.aget_state(config={"configurable": {"thread_id": thread_id}})
+        output_state = await graph.aget_state(config={"configurable": {"thread_id": thread_id}})
 
     if output_state.values.get("workflow") == "audio":
         response = output_state.values["messages"][-1].content
@@ -109,12 +109,12 @@ async def on_audio_end(elements):
 
     thread_id = cl.user_session.get("thread_id")
 
-    async with AsyncSqliteSaver.from_conn_string(settings.SHORT_TERM_MEMORY_DB_PATH) as short_term_memory:
-        graph = graph_builder.compile(checkpointer=short_term_memory)
-        output_state = await graph.ainvoke(
-            {"messages": [HumanMessage(content=transcription)]},
-            {"configurable": {"thread_id": thread_id}},
-        )
+    short_term_memory = MemorySaver()
+    graph = graph_builder.compile(checkpointer=short_term_memory)
+    output_state = graph.invoke(
+        {"messages": [HumanMessage(content=transcription)]},
+        {"configurable": {"thread_id": thread_id}},
+    )
 
     # Use global TextToSpeech instance
     audio_buffer = await text_to_speech.synthesize(output_state["messages"][-1].content)

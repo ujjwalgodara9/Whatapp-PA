@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import os
 from uuid import uuid4
 from ai_companion.modules.mcp_logic.mcp_executor import run_mcp_task
@@ -153,9 +154,14 @@ async def mcp_node(state: AICompanionState):
     """
     Executes MCP tasks like Playwright browsing.
     """
-    last_message = state["messages"][-1].content if state["messages"] else ""
+    if not state["messages"]:
+        return {"messages": AIMessage(content="No message to process")}
+        
+    last_message = state["messages"][-1].content
+    logger.info(f"Processing MCP request: {last_message}")
+    
     result = await run_mcp_task(last_message)
+    logger.info(f"MCP result: {result}")
 
     return {"messages": AIMessage(content=result)}
-
 

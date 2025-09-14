@@ -1,4 +1,5 @@
 import os
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
@@ -7,6 +8,7 @@ from typing import List, Optional
 from ai_companion.settings import settings
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.http.exceptions import UnexpectedResponse
 from sentence_transformers import SentenceTransformer
 
 
@@ -48,7 +50,11 @@ class VectorStore:
         if not self._initialized:
             self._validate_env_vars()
             self.model = SentenceTransformer(self.EMBEDDING_MODEL)
-            self.client = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY)
+            self.logger = logging.getLogger(__name__)
+            self.client = QdrantClient(
+                url=settings.QDRANT_URL, 
+                api_key=settings.QDRANT_API_KEY
+            )
             self._initialized = True
 
     def _validate_env_vars(self) -> None:
@@ -59,19 +65,28 @@ class VectorStore:
 
     def _collection_exists(self) -> bool:
         """Check if the memory collection exists."""
-        collections = self.client.get_collections().collections
-        return any(col.name == self.COLLECTION_NAME for col in collections)
+        try:
+            collections = self.client.get_collections().collections
+            return any(col.name == self.COLLECTION_NAME for col in collections)
+        except Exception as e:
+            self.logger.error(f"Error checking if collection exists: {e}")
+            return False
 
     def _create_collection(self) -> None:
         """Create a new collection for storing memories."""
-        sample_embedding = self.model.encode("sample text")
-        self.client.create_collection(
-            collection_name=self.COLLECTION_NAME,
-            vectors_config=VectorParams(
-                size=len(sample_embedding),
-                distance=Distance.COSINE,
-            ),
-        )
+        try:
+            sample_embedding = self.model.encode("sample text")
+            self.client.create_collection(
+                collection_name=self.COLLECTION_NAME,
+                vectors_config=VectorParams(
+                    size=len(sample_embedding),
+                    distance=Distance.COSINE,
+                ),
+            )
+            self.logger.info(f"Created collection: {self.COLLECTION_NAME}")
+        except Exception as e:
+            self.logger.error(f"Error creating collection: {e}")
+            raise
 
     def find_similar_memory(self, text: str) -> Optional[Memory]:
         """Find if a similar memory already exists.
@@ -82,10 +97,14 @@ class VectorStore:
         Returns:
             Optional Memory if a similar one is found
         """
-        results = self.search_memories(text, k=1)
-        if results and results[0].score >= self.SIMILARITY_THRESHOLD:
-            return results[0]
-        return None
+        try:
+            results = self.search_memories(text, k=1)
+            if results and results[0].score >= self.SIMILARITY_THRESHOLD:
+                return results[0]
+            return None
+        except Exception as e:
+            self.logger.error(f"Error finding similar memory: {e}")
+            return None
 
     def store_memory(self, text: str, metadata: dict) -> None:
         """Store a new memory in the vector store or update if similar exists.
@@ -94,28 +113,33 @@ class VectorStore:
             text: The text content of the memory
             metadata: Additional information about the memory (timestamp, type, etc.)
         """
-        if not self._collection_exists():
-            self._create_collection()
+        try:
+            if not self._collection_exists():
+                self._create_collection()
 
-        # Check if similar memory exists
-        similar_memory = self.find_similar_memory(text)
-        if similar_memory and similar_memory.id:
-            metadata["id"] = similar_memory.id  # Keep same ID for update
+            # Check if similar memory exists
+            similar_memory = self.find_similar_memory(text)
+            if similar_memory and similar_memory.id:
+                metadata["id"] = similar_memory.id  # Keep same ID for update
 
-        embedding = self.model.encode(text)
-        point = PointStruct(
-            id=metadata.get("id", hash(text)),
-            vector=embedding.tolist(),
-            payload={
-                "text": text,
-                **metadata,
-            },
-        )
+            embedding = self.model.encode(text)
+            point = PointStruct(
+                id=metadata.get("id", hash(text)),
+                vector=embedding.tolist(),
+                payload={
+                    "text": text,
+                    **metadata,
+                },
+            )
 
-        self.client.upsert(
-            collection_name=self.COLLECTION_NAME,
-            points=[point],
-        )
+            self.client.upsert(
+                collection_name=self.COLLECTION_NAME,
+                points=[point],
+            )
+            self.logger.info(f"Stored memory: {text[:50]}...")
+        except Exception as e:
+            self.logger.error(f"Error storing memory: {e}")
+            raise
 
     def search_memories(self, query: str, k: int = 5) -> List[Memory]:
         """Search for similar memories in the vector store.
@@ -127,24 +151,35 @@ class VectorStore:
         Returns:
             List of Memory objects
         """
-        if not self._collection_exists():
-            return []
+        try:
+            if not self._collection_exists():
+                return []
 
-        query_embedding = self.model.encode(query)
-        results = self.client.search(
-            collection_name=self.COLLECTION_NAME,
-            query_vector=query_embedding.tolist(),
-            limit=k,
-        )
-
-        return [
-            Memory(
-                text=hit.payload["text"],
-                metadata={k: v for k, v in hit.payload.items() if k != "text"},
-                score=hit.score,
+            query_embedding = self.model.encode(query)
+            results = self.client.search(
+                collection_name=self.COLLECTION_NAME,
+                query_vector=query_embedding.tolist(),
+                limit=k,
             )
-            for hit in results
-        ]
+
+            memories = [
+                Memory(
+                    text=hit.payload["text"],
+                    metadata={k: v for k, v in hit.payload.items() if k != "text"},
+                    score=hit.score,
+                )
+                for hit in results
+            ]
+            
+            self.logger.debug(f"Found {len(memories)} memories for query: {query[:50]}...")
+            return memories
+            
+        except UnexpectedResponse as e:
+            self.logger.error(f"Qdrant server error during search: {e}")
+            return []
+        except Exception as e:
+            self.logger.error(f"Error searching memories: {e}")
+            return []
 
 
 @lru_cache

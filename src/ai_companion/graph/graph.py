@@ -63,8 +63,3 @@ def create_workflow_graph():
 
 # Compiled without a checkpointer. Used for LangGraph Studio
 graph = create_workflow_graph().compile()
-if __name__ == "__main__":
-    print("Graph module loaded ✅")
-    # Optionally, run something here
-    # graph = create_workflow_graph()
-    # print(graph)
