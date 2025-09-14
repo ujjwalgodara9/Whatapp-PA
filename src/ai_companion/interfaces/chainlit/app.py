@@ -78,7 +78,22 @@ async def on_message(message: cl.Message):
         image = cl.Image(path=output_state.values["image_path"], display="inline")
         await cl.Message(content=response, elements=[image]).send()
     else:
-        await msg.send()
+        # Check for MCP file/image result
+        last_message = output_state.values["messages"][-1]
+        content = getattr(last_message, "content", "")
+        file_url = None
+        if hasattr(last_message, "additional_kwargs") and last_message.additional_kwargs:
+            file_url = last_message.additional_kwargs.get("file_url")
+        if file_url:
+            # Show as downloadable link or image in Chainlit
+            if file_url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                image = cl.Image(path=file_url, display="inline")
+                await cl.Message(content=content, elements=[image]).send()
+            else:
+                await cl.Message(content=f"{content}\n[Download file]({file_url})").send()
+        else:
+            msg.content = content
+            await msg.send()
 
 
 @cl.on_audio_chunk

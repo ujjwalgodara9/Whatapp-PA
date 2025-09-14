@@ -163,5 +163,10 @@ async def mcp_node(state: AICompanionState):
     result = await run_mcp_task(last_message)
     logger.info(f"MCP result: {result}")
 
-    return {"messages": AIMessage(content=result)}
+    # If result is a special file/image marker, return as AIMessage with metadata
+    if isinstance(result, str) and result.startswith("__MCP_FILE__::"):
+        _, file_url, summary = result.split("::", 2)
+        return {"messages": AIMessage(content=summary, additional_kwargs={"file_url": file_url})}
+    else:
+        return {"messages": AIMessage(content=result)}
 
